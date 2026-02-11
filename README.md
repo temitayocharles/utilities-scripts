@@ -17,6 +17,24 @@ Central toolbox for platform operations: scanning, backups, vault, CI helpers, a
 ## Usage
 Each tool has its own README in its folder.
 
+## Vault Seeding
+`vault/seed_vault_from_env.py` seeds Vault from `.env.example` plus a real `.env` file.
+
+Example:
+```bash
+export VAULT_ADDR="http://vault.vault.svc:8200"
+export VAULT_USERNAME="temitayocharles"
+export VAULT_PASSWORD="***"
+python3 vault/seed_vault_from_env.py \
+  --env staging \
+  --repo fintech-user-service \
+  --service api \
+  --env-example /path/to/.env.example \
+  --env-file /path/to/.env \
+  --base-path kv/temitayo \
+  --write
+```
+
 ## Dependency Graph
 ```
 utilities-scripts
