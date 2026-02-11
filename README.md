@@ -1,6 +1,14 @@
 # Utilities Scripts
 
+
+## Start Here
+- Read [START_HERE.md](START_HERE.md) for the chronological playbook.
+
 Central toolbox for platform operations: scanning, backups, vault, CI helpers, and infra utilities.
+
+
+## Documentation Index
+- [docs/PLATFORM_README.md](docs/PLATFORM_README.md)
 
 ## Structure
 - `scanners/`: GitHub repo scanning + env/secret extraction
