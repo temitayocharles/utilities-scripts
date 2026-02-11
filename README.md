@@ -16,3 +16,12 @@ Central toolbox for platform operations: scanning, backups, vault, CI helpers, a
 
 ## Usage
 Each tool has its own README in its folder.
+
+## Dependency Graph
+```
+utilities-scripts
+  -> configurations (scan and generate .env.example)
+  -> Vault (seed secrets)
+  -> shared-workflows (CI helpers and scanners)
+  -> platform-gitops (optional bootstrap helpers)
+```
