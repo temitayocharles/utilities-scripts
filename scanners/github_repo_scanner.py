@@ -131,7 +131,11 @@ def write_env_example(repo_dir: Path, keys: List[str]) -> None:
 
 def build_vault_seed(repo: str, env: str, base: str, secrets: List[str]) -> Dict[str, dict]:
     data = {k: "" for k in secrets}
-    path = f"{base.rstrip('/')}/{env}/{repo}".replace("//", "/")
+    base = base.rstrip("/")
+    # If using KV v2 mount (common default "kv"), write to kv/data/*
+    if base == "kv" or base.startswith("kv/"):
+        base = "kv/data" + ("" if base == "kv" else f"/{base.split('/', 1)[1]}")
+    path = f"{base}/{env}/{repo}".replace("//", "/")
     return {path: data}
 
 
@@ -165,6 +169,9 @@ def main():
     p.add_argument("--org", help="GitHub org")
     p.add_argument("--repos", nargs="*", help="Specific repos (full_name)")
     p.add_argument("--dest", default="./repos", help="Clone destination")
+    p.add_argument("--local-root", help="Scan repos from a local root directory")
+    p.add_argument("--skip-missing", action="store_true", help="Skip repos missing under local root")
+    p.add_argument("--clone-missing", action="store_true", help="Clone missing repos into dest when using local root")
     p.add_argument("--env", default="staging")
     p.add_argument("--vault-base", default="kv/temitayo")
     p.add_argument("--write-vault", action="store_true")
@@ -175,6 +182,7 @@ def main():
 
     dest = Path(args.dest).resolve()
     dest.mkdir(parents=True, exist_ok=True)
+    local_root = Path(args.local_root).resolve() if args.local_root else None
 
     repos = args.repos or list_repos(args.user, args.org)
     if not repos:
@@ -190,7 +198,21 @@ def main():
     report = []
 
     for repo in repos:
-        repo_dir = clone_or_pull(repo, dest)
+        repo_dir: Path
+        if local_root:
+            candidate = local_root / repo.split("/")[-1]
+            if candidate.exists():
+                repo_dir = candidate
+            else:
+                if args.clone_missing:
+                    repo_dir = clone_or_pull(repo, dest)
+                elif args.skip_missing:
+                    report.append({"repo": repo, "skipped": "missing_local"})
+                    continue
+                else:
+                    raise SystemExit(f"Missing local repo: {candidate}")
+        else:
+            repo_dir = clone_or_pull(repo, dest)
         keys = scan_repo(repo_dir)
         configs, secrets = classify_keys(keys)
 
