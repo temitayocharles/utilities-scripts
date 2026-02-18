@@ -51,3 +51,8 @@ utilities-scripts
   -> shared-workflows (CI helpers and scanners)
   -> platform-gitops (optional bootstrap helpers)
 ```
+
+
+## Architecture Maps
+- [DEPENDENCY_LADDER.md](./DEPENDENCY_LADDER.md)
+- [ARCHITECTURE.md](./ARCHITECTURE.md)
